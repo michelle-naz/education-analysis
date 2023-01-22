@@ -1,0 +1,304 @@
+rm(list=ls())
+library(hrbrthemes)
+library(cowplot)
+library(viridis)
+library(readxl)
+library(tidyverse)
+setwd("/Users/michellenazareth/Desktop/R")
+
+##TaRL PROGRAMME IN ZAMBIA: Analysis and Visualization
+
+data<-read_excel("raw data sheet.xlsx", sheet= "raw data sheet") #reads data from excel
+df<-as_tibble(data) #copy of the data to work with
+df[df==99]<-NA #replacing all 99 with NA
+df<-df%>%select(province, grade:ncuclasses)
+
+#Number of students across categories (basic statistics):
+df%>%group_by(grade)%>%summarize(n())
+df%>%group_by(sex)%>%summarize(n())
+df%>%group_by(province)%>%summarize(n())
+
+#Summarizing by province
+average_learning_province<-df%>%group_by(province)%>%summarize(lang_Jan=mean(LangBaselineJan, na.rm=TRUE), lang_Oct=mean(LangBaselineOct, na.rm=TRUE), lang_Mar=mean(LangMidlineMar, na.rm=TRUE), NR_Jan=mean(NRBaselineJan, na.rm=TRUE), NR_Mar=mean(NRMidlineMar,na.rm=TRUE), NR_Oct=mean(NRBaselineOct, na.rm=TRUE), AS_Jan=mean(ASBaselineJan,na.rm=TRUE), AS_Mar=mean(ASMidlineMar,na.rm=TRUE), AS_Oct=mean(ASBaselineOct, na.rm=TRUE), MD_Jan=mean(MDBaselineJan, na.rm=TRUE), MD_Oct=mean(MDBaselineOct, na.rm=TRUE), MD_Mar=mean(MDMidlineMar, na.rm=TRUE))%>%gather(key="type_month", value="score", lang_Jan:MD_Mar)%>%mutate(type=sub("_.*", "", type_month),month=sub(".*_","",type_month))
+average_learning_province<-average_learning_province%>%select(province, month, type, score)%>%spread(key=type,value=score)
+g1=ggplot(data=average_learning_province, aes(x=month,y=AS, group=province))+geom_line(aes(color=province))+geom_point(aes(color=province))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g2=ggplot(data=average_learning_province, aes(x=month,y=MD, group=province))+geom_line(aes(color=province))+geom_point(aes(color=province))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g3=ggplot(data=average_learning_province, aes(x=month,y=lang, group=province))+geom_line(aes(color=province))+geom_point(aes(color=province))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g4=ggplot(data=average_learning_province, aes(x=month,y=NR, group=province))+geom_line(aes(color=province))+geom_point(aes(color=province))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+plot_grid(g1, g2, g3,g4, labels = c('Addition/Subtraction', 'Multiplication/Division','Reading(Language)','Number recognition'), label_size = 8)
+
+#Summarizing by gender
+average_learning_sex<-df%>%group_by(sex)%>%summarize(lang_Jan=mean(LangBaselineJan, na.rm=TRUE), lang_Oct=mean(LangBaselineOct, na.rm=TRUE), lang_Mar=mean(LangMidlineMar, na.rm=TRUE), NR_Jan=mean(NRBaselineJan, na.rm=TRUE), NR_Mar=mean(NRMidlineMar,na.rm=TRUE), NR_Oct=mean(NRBaselineOct, na.rm=TRUE), AS_Jan=mean(ASBaselineJan,na.rm=TRUE), AS_Mar=mean(ASMidlineMar,na.rm=TRUE), AS_Oct=mean(ASBaselineOct, na.rm=TRUE), MD_Jan=mean(MDBaselineJan, na.rm=TRUE), MD_Oct=mean(MDBaselineOct, na.rm=TRUE), MD_Mar=mean(MDMidlineMar, na.rm=TRUE))%>%gather(key="type_month", value="score", lang_Jan:MD_Mar)%>%mutate(type=sub("_.*", "", type_month),month=sub(".*_","",type_month))
+average_learning_sex<-average_learning_sex%>%select(sex, month, type, score)%>%spread(key=type,value=score)
+g1=ggplot(data=average_learning_sex, aes(x=month,y=AS, group=sex))+geom_line(aes(color=sex))+geom_point(aes(color=sex))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g2=ggplot(data=average_learning_sex, aes(x=month,y=MD, group=sex))+geom_line(aes(color=sex))+geom_point(aes(color=sex))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g3=ggplot(data=average_learning_sex, aes(x=month,y=lang, group=sex))+geom_line(aes(color=sex))+geom_point(aes(color=sex))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g4=ggplot(data=average_learning_sex, aes(x=month,y=NR, group=sex))+geom_line(aes(color=sex))+geom_point(aes(color=sex))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+plot_grid(g1, g2, g3,g4, labels = c('Addition/Subtraction', 'Multiplication/Division','Reading(Language)','Number recognition'), label_size = 8)
+
+#Summarizing by grade
+average_learning_grade<-df%>%group_by(grade)%>%summarize(lang_Jan=mean(LangBaselineJan, na.rm=TRUE), lang_Oct=mean(LangBaselineOct, na.rm=TRUE), lang_Mar=mean(LangMidlineMar, na.rm=TRUE), NR_Jan=mean(NRBaselineJan, na.rm=TRUE), NR_Mar=mean(NRMidlineMar,na.rm=TRUE), NR_Oct=mean(NRBaselineOct, na.rm=TRUE), AS_Jan=mean(ASBaselineJan,na.rm=TRUE), AS_Mar=mean(ASMidlineMar,na.rm=TRUE), AS_Oct=mean(ASBaselineOct, na.rm=TRUE), MD_Jan=mean(MDBaselineJan, na.rm=TRUE), MD_Oct=mean(MDBaselineOct, na.rm=TRUE), MD_Mar=mean(MDMidlineMar, na.rm=TRUE))%>%gather(key="type_month", value="score", lang_Jan:MD_Mar)%>%mutate(type=sub("_.*", "", type_month),month=sub(".*_","",type_month))
+average_learning_grade<-average_learning_grade%>%select(grade, month, type, score)%>%spread(key=type,value=score)
+g1=ggplot(data=average_learning_grade, aes(x=month,y=AS, group=grade))+geom_line(aes(color=grade))+geom_point(aes(color=grade))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g2=ggplot(data=average_learning_grade, aes(x=month,y=MD, group=grade))+geom_line(aes(color=grade))+geom_point(aes(color=grade))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g3=ggplot(data=average_learning_grade, aes(x=month,y=lang, group=grade))+geom_line(aes(color=grade))+geom_point(aes(color=grade))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+g4=ggplot(data=average_learning_grade, aes(x=month,y=NR, group=grade))+geom_line(aes(color=grade))+geom_point(aes(color=grade))+theme_ipsum()+theme(legend.title=element_blank())+xlab("")+ylab("")
+plot_grid(g1, g2, g3,g4, labels = c('Addition/Subtraction', 'Multiplication/Division','Reading(Language)','Number recognition'), label_size = 8)
+
+##Reading by province:
+df1<-select(df, province, LangBaselineJan:LangBaselineOct)
+df1<-df1 %>% rename(Jan = LangBaselineJan, Mar = LangMidlineMar,Oct=LangBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,province, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(4,3,2,1,0),labels=c("Story","Paragraph", "Word","Letters","Beginner"))
+g=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="READING")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~province)
+
+##Number recognition by province
+df1<-select(df, province, NRBaselineJan:NRBaselineOct)
+df1<-df1 %>% rename(Jan = NRBaselineJan, Mar = NRMidlineMar,Oct=NRBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,province, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(4,3,2,1,0),labels=c("Level 4","Level 3", "Level 2","Level 1","Beginner"))
+h=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="NUMBER RECOGNITION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~province)
+
+##Multiplication/Division by province
+df1<-select(df, province, MDBaselineJan:MDBaselineOct)
+df1<-df1 %>% rename(Jan = MDBaselineJan, Mar = MDMidlineMar,Oct=MDBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,province, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(2,1,0),labels=c("Multiplication and Division","Multiplication", "Neither"))
+i=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="MULTIPLICATION AND DIVISION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~province)
+
+##Addition and Subtraction by province
+df1<-select(df, province, ASBaselineJan:ASBaselineOct)
+df1<-df1 %>% rename(Jan = ASBaselineJan, Mar = ASMidlineMar,Oct=ASBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,province, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(2,1,0),labels=c("Addition and Subtraction","Addition", "Neither"))
+j=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="ADDITION AND SUBTRACTION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~province)
+
+
+##Reading by sex:
+df1<-select(df, sex, LangBaselineJan:LangBaselineOct)
+df1<-df1 %>% rename(Jan = LangBaselineJan, Mar = LangMidlineMar,Oct=LangBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,sex, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(4,3,2,1,0),labels=c("Story","Paragraph", "Word","Letters","Beginner"))
+g=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="READING")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~sex)
+
+##Number recognition by sex
+df1<-select(df, sex, NRBaselineJan:NRBaselineOct)
+df1<-df1 %>% rename(Jan = NRBaselineJan, Mar = NRMidlineMar,Oct=NRBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,sex, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(4,3,2,1,0),labels=c("Level 4","Level 3", "Level 2","Level 1","Beginner"))
+h=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="NUMBER RECOGNITION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~sex)
+
+##Multiplication/Division by sex
+df1<-select(df, sex, MDBaselineJan:MDBaselineOct)
+df1<-df1 %>% rename(Jan = MDBaselineJan, Mar = MDMidlineMar,Oct=MDBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,sex, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(2,1,0),labels=c("Multiplication and Division","Multiplication", "Neither"))
+i=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="MULTIPLICATION AND DIVISION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~sex)
+
+##Addition and Subtraction by sex
+df1<-select(df, sex, ASBaselineJan:ASBaselineOct)
+df1<-df1 %>% rename(Jan = ASBaselineJan, Mar = ASMidlineMar,Oct=ASBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,sex, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(2,1,0),labels=c("Addition and Subtraction","Addition", "Neither"))
+j=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="ADDITION AND SUBTRACTION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~sex)
+
+##Reading by grade:
+df1<-select(df, grade, LangBaselineJan:LangBaselineOct)
+df1<-df1 %>% rename(Jan = LangBaselineJan, Mar = LangMidlineMar,Oct=LangBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,grade, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(4,3,2,1,0),labels=c("Story","Paragraph", "Word","Letters","Beginner"))
+g=ggplot(df1, aes(fill=score,x=reading, y=Freq))+
+  geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+
+  labs(title="READING")+xlab("")+ylab("")+theme_ipsum()+
+  theme(legend.title = element_blank())+facet_wrap(~grade)
+
+##Number recognition by grade:
+df1<-select(df, grade, NRBaselineJan:NRBaselineOct)
+df1<-df1 %>% rename(Jan = NRBaselineJan, Mar = NRMidlineMar,Oct=NRBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,grade, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(4,3,2,1,0),labels=c("Level 4","Level 3", "Level 2","Level 1","Beginner"))
+h=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="NUMBER RECOGNITION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~grade)
+
+##Multiplication/Division by grade:
+df1<-select(df, grade, MDBaselineJan:MDBaselineOct)
+df1<-df1 %>% rename(Jan = MDBaselineJan, Mar = MDMidlineMar,Oct=MDBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,grade, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(2,1,0),labels=c("Multiplication and Division","Multiplication", "Neither"))
+i=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="MULTIPLICATION AND DIVISION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~grade)
+
+##Addition and Subtraction by province
+df1<-select(df, grade, ASBaselineJan:ASBaselineOct)
+df1<-df1 %>% rename(Jan = ASBaselineJan, Mar = ASMidlineMar,Oct=ASBaselineOct)
+df1<-gather(df1, key="reading", value="score", Jan:Oct)
+df1<-rename(count(df1,grade, reading, score), Freq = n)
+df1<-df1%>%filter(is.na(score)==FALSE)%>%arrange(desc(score))
+df1$score=factor(df1$score, levels=c(2,1,0),labels=c("Addition and Subtraction","Addition", "Neither"))
+j=ggplot(df1, aes(fill=score,x=reading, y=Freq))+geom_bar(stat="identity", position="fill")+scale_fill_viridis(discrete = T)+labs(title="ADDITION AND SUBTRACTION")+xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())+facet_wrap(~grade)
+
+
+##Boxplots b/w ncuclasses and learning gain scores
+#Reading
+df1<-mutate(df, learning_gain=LangMidlineMar-LangBaselineJan)
+df1$learning_gain=factor(df1$learning_gain)
+ggplot(filter(df1,is.na(learning_gain)==FALSE), aes(x=learning_gain, y=ncuclasses, fill=learning_gain)) +geom_boxplot() +ylim(0,50)+scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("NUMBER OF CLASSES AND LEARNING GAINS (READING)") +
+  xlab("")+ylab("")
+ggplot(df1, aes(y=ncuclasses, x=learning_gain, colour=province, alpha=province))+geom_point()+ylim(0,50)+theme_ipsum()
+
+#Addition and Subtraction
+df1<-mutate(df, learning_gain=ASMidlineMar-ASBaselineJan)
+df1$learning_gain=factor(df1$learning_gain)
+ggplot(filter(df1,is.na(learning_gain)==FALSE), aes(x=learning_gain, y=ncuclasses, fill=learning_gain)) +geom_boxplot() +ylim(0,50)+scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("NUMBER OF CLASSES AND LEARNING GAINS (ADDITION AND SUBTRACTION)") +
+  xlab("")+ylab("")
+ggplot(df1, aes(y=ncuclasses, x=learning_gain, colour=province, alpha=province))+geom_point()+ylim(0,50)+theme_ipsum()
+
+#Multiplication and division
+df1<-mutate(df, learning_gain=MDMidlineMar-MDBaselineJan)
+df1$learning_gain=factor(df1$learning_gain)
+ggplot(filter(df1,is.na(learning_gain)==FALSE), aes(x=learning_gain, y=ncuclasses, fill=learning_gain)) +geom_boxplot() +ylim(0,50)+scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("NUMBER OF CLASSES AND LEARNING GAINS (MULTIPLICATION AND DIVISION)") +
+  xlab("")+ylab("")
+ggplot(df1, aes(y=ncuclasses, x=learning_gain, colour=province))+geom_point(colour="blue")+ylim(0,50)
+
+#Number recognition
+df1<-mutate(df, learning_gain=NRMidlineMar-NRBaselineJan)
+df1$learning_gain=factor(df1$learning_gain)
+ggplot(filter(df1,is.na(learning_gain)==FALSE, learning_gain!=-3&learning_gain!=-4), aes(x=learning_gain, y=ncuclasses, fill=learning_gain)) +geom_boxplot() +ylim(0,50)+scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("NUMBER OF CLASSES AND LEARNING GAINS (NUMBER RECOGNITION)") +
+  xlab("")+ylab("")
+ggplot(df1, aes(y=ncuclasses, x=learning_gain, colour=province, alpha=province))+geom_point()+ylim(0,50)+theme_ipsum()
+
+#Average number of classes received by different groups (Targeting)
+df1<-df%>%group_by(sex)%>%summarize(class=mean(ncuclasses,na.rm=TRUE))
+df1<-df%>%group_by(sex)%>%summarize(class=median(ncuclasses,na.rm=TRUE))
+df1<-df%>%group_by(province)%>%summarize(class=mean(ncuclasses,na.rm=TRUE))
+df1<-df%>%group_by(province)%>%summarize(class=median(ncuclasses,na.rm=TRUE))
+
+#Targeting of the program
+#By reading
+df1<-select(df, province, LangBaselineJan:LangBaselineOct, ncuclasses)
+df1$LangBaselineJan=factor(df1$LangBaselineJan)
+ggplot(filter(df1,is.na(LangBaselineJan)==FALSE), aes(x=LangBaselineJan, y=ncuclasses, fill=LangBaselineJan)) +geom_boxplot() +ylim(0,50)+scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("TARGETING OF THE PROGRAMME AT BASELINE JANUARY (ADDITION AND SUBTRACTION)") +
+  xlab("")+ylab("")
+#By addition and subtraction
+df1<-select(df, province, ASBaselineJan:ASBaselineOct, ncuclasses)
+df1$ASBaselineJan=factor(df1$ASBaselineJan)
+ggplot(filter(df1,is.na(ASBaselineJan)==FALSE), aes(x=ASBaselineJan, y=ncuclasses, fill=ASBaselineJan)) +geom_boxplot() +ylim(0,50)+scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("TARGETING OF THE PROGRAMME AT BASELINE JANUARY (ADDITION AND SUBTRACTION)") +
+  xlab("")+ylab("")
+
+
+##THE IHDS-II SURVEY (EDUCATION): Visualization for five Indian States
+load("36151-0008-Data.rda")
+load("36151-0009-Data.rda")
+df<-as_tibble(da36151.0008)
+df1<-as_tibble(da36151.0009)
+df1<-df1%>%select(STATEID, PS1, PS2, PS4, PS6, PS6A, PS10,PS14A, PS14B, PS15A, PS15C, PS16, PS16A1, PS16A2, PS22C, PS23C,SO42A)%>%filter(PS2=="(3) Co-educational 3"&(STATEID=="(09) Uttar Pradesh 09" |STATEID=="(10) Bihar 10"|STATEID=="(27) Maharashtra 27"|STATEID=="(32) Kerala 32"|STATEID=="(33) Tamil Nadu 33"))
+
+
+##Types of schools
+df_test<-rename(count(df1, STATEID, PS1), Freq = n)
+ggplot(df_test, aes(fill=PS1,x=STATEID, y=Freq))+geom_bar(stat="identity", position="fill")+
+  scale_fill_viridis(discrete = T)+labs(title="Type of school")+
+  xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())
+
+#Percentage of girls
+df_test<-df1%>%mutate(percent_girls=(PS6A/PS6)*100)
+ggplot(df_test, aes(x=STATEID, y=percent_girls, fill=STATEID)) +geom_boxplot() +scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("PERCENTAGE OF GIRLS IN SCHOOL") +
+  xlab("")+ylab("")
+
+#Separate toilets and percentage of girls
+df_test$PS16A1=factor(df_test$PS16A1)
+ggplot(filter(df_test, (STATEID=="(09) Uttar Pradesh 09" |STATEID=="(10) Bihar 10" )& is.na(PS16A1)==FALSE), aes(x=PS16A1, y=percent_girls, fill=PS16A1)) +geom_boxplot() +scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("TOILET FACILITIES AND PERCENTAGE OF GIRLS IN SCHOOL") +
+  xlab("")+ylab("")
+
+#Do children get a free midday meal?
+df_test<-rename(count(df1, STATEID, PS10), Freq = n)
+ggplot(df_test, aes(fill=PS10,x=STATEID, y=Freq))+geom_bar(stat="identity", position="fill")+
+  scale_fill_viridis(discrete = T)+labs(title="Do children get a free midday meal?")+
+  xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())
+
+#Hours of electricity
+ggplot(df1, aes(x=STATEID, y=PS14A, fill=STATEID)) +geom_boxplot() +scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("HOURS OF ELECTRICITY IN SCHOOL") +
+  xlab("")+ylab("")
+
+#How often does electricity fail?
+df_test<-rename(count(df1, STATEID, PS14B), Freq = n)
+ggplot(filter(df_test, is.na(PS14B)==FALSE), aes(fill=PS14B,x=STATEID, y=Freq))+geom_bar(stat="identity", position="fill")+
+  scale_fill_viridis(discrete = T)+labs(title="How often does electricity fail?")+
+  xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())
+
+#Source of drinking water
+df_test<-df1%>%filter(PS15A=="(01) Piped 1"|PS15A=="(02) Tube well 2"|PS15A=="(03) Hand pump 3"|PS15A=="(04) Dug, open well 4")
+df_test<-rename(count(df_test,STATEID, PS15A), Freq = n)
+ggplot(df_test, aes(fill=PS15A,x=STATEID, y=Freq))+geom_bar(stat="identity", position="fill")+
+  scale_fill_viridis(discrete = T)+labs(title="Source of drinking water")+
+  xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())
+
+#Untouchability
+df_test<-rename(count(df1,STATEID, PS15C), Freq = n)
+ggplot(filter(df_test, is.na(PS15C)==FALSE), aes(fill=PS15C,x=STATEID, y=Freq))+geom_bar(stat="identity", position="fill")+
+  scale_fill_viridis(discrete = T)+labs(title="Caste-based segregation of drinking water facilities")+
+  xlab("")+ylab("")+theme_ipsum()+theme(legend.title = element_blank())
+
+#Percentage of girls and scholarships for girls
+df_test<-df1%>%mutate(percent_girls=(PS6A/PS6)*100)
+ggplot(filter(df_test, is.na(PS22C)==FALSE), aes(x=PS22C, y=percent_girls, fill=PS22C)) +geom_boxplot() +scale_fill_viridis(discrete = TRUE, alpha=0.8) +
+  geom_jitter(color="darkgrey", size=0.4, alpha=0.3) +
+  theme_ipsum() +
+  theme(legend.position="none", plot.title = element_text(size=11)) +
+  ggtitle("SCHOLARSHIP PROVISIONS AND PERCENTAGE OF GIRLS IN SCHOOL") +
+  xlab("")+ylab("")
